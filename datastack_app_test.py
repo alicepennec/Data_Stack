@@ -1,13 +1,12 @@
 import streamlit as st
 import pandas as pd
-from sqlalchemy import create_engine
 import requests
+from sqlalchemy import create_engine
 
 # Configuration globale
 st.set_page_config(page_title="DataStack - Data Engineering App", layout="wide")
 
 # === Fonctionnalités Générales ===
-#TODOtodo ajouter l'encoding
 
 def load_local_file(file, delimiter):
     """Charger un fichier local (CSV, Excel, etc.) avec un délimiteur défini."""
@@ -32,21 +31,23 @@ def load_from_database(connection_string, query):
     except Exception as e:
         st.error(f"Erreur de connexion à la base de données : {e}")
         return None
-    
-    
-def load_from_api(API_URL):
-    """Charger des données à partir d'une API."""
 
-     
-    try:  
-        response = requests.get(API_URL)  
-        res=response.raise_for_status()  # Vérifie les erreurs  
-        if res == 200:
-            data = response.json()  
-            return data  
-    except requests.exceptions.RequestException as e:  
-        st.error(f"Erreur lors de la requête: {e}")  
-        return []  
+def load_from_api(api_url, headers, params):
+    """Charger des données depuis une API."""
+    try:
+        response = requests.get(api_url, headers=headers, params=params)
+        response.raise_for_status()  # Lève une exception pour les erreurs HTTP
+        data = response.json()  # Décoder la réponse JSON
+        if isinstance(data, list):
+            return pd.DataFrame(data)
+        elif isinstance(data, dict) and 'data' in data:
+            return pd.DataFrame(data['data'])
+        else:
+            st.error("Format des données API non supporté. Attendu : liste ou dictionnaire avec clé 'data'.")
+            return None
+    except Exception as e:
+        st.error(f"Erreur lors de la connexion à l'API : {e}")
+        return None
 
 def clean_data(df):
     """Nettoyer les données (exemple simplifié)."""
@@ -60,12 +61,7 @@ def explore_data(df):
     st.dataframe(df.head())
     st.write("**Résumé statistique**")
     st.write(df.describe())
-def transform():
-    pass
-def extract():
-    pass
-def load():
-    pass
+
 # === Interface Utilisateur ===
 st.title("🛠️ DataStack - Plateforme de Data Engineering")
 
@@ -97,12 +93,25 @@ elif source_type == "Base de données":
             st.dataframe(data.head())
 
 elif source_type == "API":
-    db_connection = st.sidebar.text_input("Chaîne de connexion (SQLAlchemy)", "")
-    db_query = st.sidebar.text_area("Requête SQL", "SELECT * FROM your_table")
-    if st.sidebar.button("Charger depuis la base de données"):
-        data = load_from_database(db_connection, db_query)
+    api_url = st.sidebar.text_input("URL de l'API", "https://api.example.com/data")
+    headers_input = st.sidebar.text_area("En-têtes (format JSON)", '{"Authorization": "Bearer YOUR_TOKEN"}')
+    params_input = st.sidebar.text_area("Paramètres (format JSON)", '{"key1": "value1", "key2": "value2"}')
+
+    # Convertir les entrées texte en dictionnaires
+    headers = {}
+    params = {}
+    try:
+        if headers_input:
+            headers = eval(headers_input)  # Convertir la chaîne JSON en dictionnaire
+        if params_input:
+            params = eval(params_input)
+    except Exception as e:
+        st.error(f"Erreur dans le format des en-têtes ou des paramètres : {e}")
+
+    if st.sidebar.button("Charger depuis l'API"):
+        data = load_from_api(api_url, headers, params)
         if data is not None:
-            st.success("Données chargées depuis la base de données.")
+            st.success("Données chargées depuis l'API.")
             st.write("Aperçu des données :")
             st.dataframe(data.head())
 
@@ -146,4 +155,4 @@ if "data" in locals() and data is not None:
         if "Chargement" in etl_step:
             st.write("✔️ Données chargées dans la destination (non implémenté).")
 
-st.sidebar.info("Notre Application est evolutive - Nos modules seront ajouter au fur et à mesure pour enrichir cette plateforme.")
+st.sidebar.info("Application évolutive - Ajoutez vos propres modules pour enrichir cette plateforme.")
