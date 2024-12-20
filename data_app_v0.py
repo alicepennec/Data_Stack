@@ -84,7 +84,7 @@ data = None
 
 if source_type == "Fichier local":
     uploaded_file = st.sidebar.file_uploader("Téléversez votre fichier", type=["csv", "xlsx"])
-    delimiter = st.sidebar.text_input("Délimiteur (par défaut : ',')", value=";")
+    delimiter = st.sidebar.text_input("Délimiteur (par défaut : ',')", value=",")
     if uploaded_file is not None:
         data = load_local_file(uploaded_file, delimiter)
 
@@ -113,48 +113,138 @@ elif source_type == "API":
     if st.sidebar.button("Charger depuis l'API"):
         data = load_from_api(api_url, headers, params)
 
-# 2. Nettoyage et exploration
+# 2. Traiter les données
 if data is not None:
     st.sidebar.header("2️⃣ Traiter les données")
     action = st.sidebar.selectbox(
         "Choisissez une action",
-        options=["Aperçu des données", "Nettoyer les données", "EDA (Exploration des Données)"]
+        options=["Aperçu des données", "Nettoyage des données", "EDA (Exploration des données)"]
     )
     
+    # Aperçu des données
     if action == "Aperçu des données":
         st.subheader("🔍 Aperçu des données")
-        st.dataframe(data.head())  # Afficher un aperçu unique ici
-    elif action == "Nettoyer les données":
+        st.dataframe(data.head())  # Afficher un aperçu des données
+    
+    # Nettoyage des données
+    elif action == "Nettoyage des données":
         st.subheader("🧹 Nettoyage des données")
-        cleaned_data = clean_data(data)
-        st.dataframe(cleaned_data)
-        st.download_button("Télécharger les données nettoyées", data=cleaned_data.to_csv(index=False), file_name="cleaned_data.csv")
-    elif action == "EDA (Exploration des Données)":
-        st.subheader("📊 Exploration des Données")
-        st.sidebar.info("Un peu de patience .")
+        cleaned_data = clean_data(data)  # Nettoyage des données
+        st.dataframe(cleaned_data)  # Afficher les données nettoyées
+        
+        # Télécharger les données nettoyées
+        st.download_button(
+            "Télécharger les données nettoyées",
+            data=cleaned_data.to_csv(index=False),
+            file_name="cleaned_data.csv"
+        )
+        
+    # Exploration des données
+    elif action == "EDA (Exploration des données)":
+        st.subheader("📊 Exploration des données")
+        st.sidebar.info("Un peu de patience...")
         if st.sidebar.button("Générer un rapport de profilage interactif"):
             with st.spinner("Génération du rapport..."):
                 generate_profile_report(data)
 
+
 # 3. Construction de pipeline ETL
-st.sidebar.header("3️⃣ Pipeline ETL")
 if data is not None:
-    etl_step = st.sidebar.multiselect(
-        "Étapes du pipeline ETL",
-        options=["Extraction", "Transformation", "Chargement"]
+    st.sidebar.header("3️⃣ Conception BDD")
+    steps = st.sidebar.selectbox(
+        "Conception BDD",
+        options=["Aucune action", "Création tables", "Création contrainte", "Génération schéma"],
+        index=0
     )
     
-    if st.sidebar.button("Exécuter le Pipeline ETL"):
-        st.subheader("⚙️ Pipeline ETL")
-        st.write(f"Étapes sélectionnées : {etl_step}")
-        if "Extraction" in etl_step:
-            st.write("✔️ Données extraites.")
-        if "Transformation" in etl_step:
-            transformed_data = clean_data(data)
-            st.write("✔️ Données transformées.")
-            st.dataframe(transformed_data.head())
-        if "Chargement" in etl_step:
-            st.write("✔️ Données chargées dans la destination (non implémenté).")
+    # Transformation des données (Création de tables de faits et dimensions)
+    if steps == "Création tables":
+        st.subheader("🔄 Création tables de faits et dimensions")
+    
+        # Vérifier si les données ont été nettoyées
+        if 'cleaned_data' in locals():
+            transformation_data = cleaned_data  # Utiliser les données nettoyées
+        else:
+            transformation_data = data
+            st.warning("⚠️ Les données brutes seront utilisées car aucune étape de nettoyage n'a été effectuée.")
+        
+        # Création de la table de faits
+        st.write("#### Sélectionnez les colonnes pour la Table de Faits")
+        fact_columns = st.multiselect(
+            "Colonnes pour la Table de Faits",
+            options=transformation_data.columns
+        )
+    
+        # Vérifier si des colonnes pour la table de faits ont été sélectionnées
+        if fact_columns:
+            fact_table = transformation_data[fact_columns]
+            fact_table.insert(0, 'ID', range(1, len(fact_table) + 1))  # Ajouter une colonne ID
+            st.write("#### Table de Faits")
+            st.dataframe(fact_table.head())
+            
+            # Bouton pour télécharger la table de faits
+            st.download_button(
+                label="Télécharger la Table de Faits",
+                data=fact_table.to_csv(index=False),
+                file_name="fact_table.csv",
+                mime="text/csv"
+            )
+        else:
+            st.warning("Veuillez sélectionner des colonnes pour la Table de Faits.")
+    
+        # Interface pour définir plusieurs tables de dimensions
+        st.write("#### Définir des Tables de Dimensions")
+        num_dimensions = st.number_input(
+            "Combien de tables de dimensions voulez-vous créer ?",
+            min_value=1,
+            max_value=10,
+            value=1,
+            step=1
+        )
+    
+        dimension_tables = []  # Liste pour stocker les tables de dimensions
+        dimension_names = []   # Liste pour stocker les noms des tables
 
+        for i in range(num_dimensions):
+            st.write(f"##### Table de Dimensions {i + 1}")
+            
+            # Saisir un nom pour la table
+            dimension_name = st.text_input(f"Nom pour la Table de Dimensions {i + 1}", value=f"Dimension_{i + 1}")
+            dimension_names.append(dimension_name)
 
-st.sidebar.info("Notre Application est évolutive - Les modules seront ajoutés au fur et a mesure pour enrichir cette plateforme.")
+            # Sélection des colonnes pour cette table
+            dimension_columns = st.multiselect(
+                f"Colonnes pour la Table {dimension_name}",
+                options=transformation_data.columns,
+                key=f"dim_columns_{i}"  # Clé unique pour chaque widget
+            )
+        
+            if dimension_columns:
+                # Créer la table de dimensions
+                dimension_table = transformation_data[dimension_columns]
+                dimension_table.insert(0, f"{dimension_name}ID", range(1, len(dimension_table) + 1))  # Ajouter une colonne ID
+                dimension_tables.append(dimension_table)
+                
+                st.write(f"Table de Dimensions : **{dimension_name}**")
+                st.dataframe(dimension_table.head())
+                
+                # Bouton pour télécharger la table
+                st.download_button(
+                    label=f"Télécharger la Table {dimension_name}",
+                    data=dimension_table.to_csv(index=False),
+                    file_name=f"{dimension_name}.csv",
+                    mime="text/csv"
+                )
+            else:
+                st.warning(f"Veuillez sélectionner des colonnes pour la Table de Dimensions {i + 1}.")
+
+    
+    if st.sidebar.button("Exécuter"):
+        st.subheader("⚙️ Conception BDD")
+        st.write(f"Étapes sélectionnées : {steps}")
+        if "Création tables" in steps:
+            st.write("✔️ Tables créées.")
+        if "Création contrainte" in steps:
+            st.write("✔️ Contraintes créées.")
+        if "Génération schéma" in steps:
+            st.write("✔️ Schéma généré.")
