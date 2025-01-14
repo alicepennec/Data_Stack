@@ -3,9 +3,8 @@ import pandas as pd
 import numpy as np 
 import requests
 from sqlalchemy import create_engine
-import logging  
-logging.basicConfig(level=logging.INFO)  
-
+from ydata_profiling import ProfileReport
+from streamlit.components.v1 import html
 
 # Configuration globale
 st.set_page_config(page_title="DataStack - Data Engineering App", layout="wide")
@@ -67,6 +66,14 @@ def explore_data(df):
     st.write("**Résumé statistique**")
     st.write(df.describe())
 
+def generate_profile_report(df):
+    """Générer un rapport de profilage interactif."""
+    profile = ProfileReport(df, title="Rapport EDA", explorative=True)
+    profile.to_file("eda_report.html")
+    with open("eda_report.html", "r", encoding="utf-8") as f:
+        report_html = f.read()
+    html(report_html, height=1000, scrolling=True)
+
 # === Interface Utilisateur ===
 st.title("🛠️ DataStack - Plateforme de Data Engineering")
 
@@ -76,6 +83,8 @@ source_type = st.sidebar.radio(
     "Choisissez la source de données",
     options=["Fichier local", "Base de données", "API"]
 )
+
+data = None
 
 if source_type == "Fichier local":
     uploaded_file = st.sidebar.file_uploader("Téléversez votre fichier", type=["csv", "xlsx"])
@@ -121,7 +130,7 @@ elif source_type == "API":
             st.dataframe(data.head())
 
 # 2. Nettoyage et exploration
-if "data" in locals() and data is not None:
+if data is not None:
     st.sidebar.header("2️⃣ Traiter les données")
     action = st.sidebar.selectbox(
         "Choisissez une action",
@@ -138,29 +147,7 @@ if "data" in locals() and data is not None:
         st.download_button("Télécharger les données nettoyées", data=cleaned_data.to_csv(index=False), file_name="cleaned_data.csv")
     elif action == "EDA (Exploration des Données)":
         st.subheader("📊 Exploration des Données")
-        explore_data(data)
-
-# 3. Construction de pipeline ETL
-st.sidebar.header("3️⃣ Pipeline ETL")
-if "data" in locals() and data is not None:
-    etl_step = st.sidebar.multiselect(
-        "Étapes du pipeline ETL",
-        options=["Extraction", "Transformation", "Chargement"]
-    )
-    
-    if st.sidebar.button("Exécuter le Pipeline ETL"):
-        st.subheader("⚙️ Pipeline ETL")
-        st.write(f"Étapes sélectionnées : {etl_step}")
-        # Exemple d'exécution (modifiez selon vos besoins)
-        if "Extraction" in etl_step:
-            st.write("✔️ Données extraites.")
-        if "Transformation" in etl_step:
-            transformed_data = clean_data(data)
-            st.write("✔️ Données transformées.")
-        if "Chargement" in etl_step:
-            st.write("✔️ Données chargées dans la destination (non implémenté).")
-
-
-st.sidebar.info("Application évolutive - Ajoutez vos propres modules pour enrichir cette plateforme.")
-
-
+        st.sidebar.info("Cela peut prendre un moment selon la taille de votre jeu de données.")
+        if st.sidebar.button("Générer un rapport de profilage interactif"):
+            with st.spinner("Génération du rapport..."):
+                generate_profile_report(data)
