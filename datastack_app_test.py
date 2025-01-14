@@ -1,10 +1,15 @@
 import streamlit as st
 import pandas as pd
+import numpy as np 
 import requests
 from sqlalchemy import create_engine
+import logging  
+logging.basicConfig(level=logging.INFO)  
+
 
 # Configuration globale
 st.set_page_config(page_title="DataStack - Data Engineering App", layout="wide")
+
 
 # === Fonctionnalités Générales ===
 
@@ -155,4 +160,7 @@ if "data" in locals() and data is not None:
         if "Chargement" in etl_step:
             st.write("✔️ Données chargées dans la destination (non implémenté).")
 
+
 st.sidebar.info("Application évolutive - Ajoutez vos propres modules pour enrichir cette plateforme.")
+
+
