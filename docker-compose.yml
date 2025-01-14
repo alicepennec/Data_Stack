@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  streamlit:
+    build: 
+      context: ./app 
+    container_name: Data_stack_app
+    ports:
+      - "8502:8502"

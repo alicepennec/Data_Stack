@@ -1,11 +1,23 @@
 import streamlit as st
 import pandas as pd
+<<<<<<< HEAD
 import requests
 from sqlalchemy import create_engine
+=======
+import numpy as np 
+import requests
+from sqlalchemy import create_engine
+from ydata_profiling import ProfileReport
+from streamlit.components.v1 import html
+>>>>>>> b2a292889ae145893c8aad36652f871109564ab8
 
 # Configuration globale
 st.set_page_config(page_title="DataStack - Data Engineering App", layout="wide")
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> b2a292889ae145893c8aad36652f871109564ab8
 # === Fonctionnalités Générales ===
 
 def load_local_file(file, delimiter):
@@ -62,6 +74,17 @@ def explore_data(df):
     st.write("**Résumé statistique**")
     st.write(df.describe())
 
+<<<<<<< HEAD
+=======
+def generate_profile_report(df):
+    """Générer un rapport de profilage interactif."""
+    profile = ProfileReport(df, title="Rapport EDA", explorative=True)
+    profile.to_file("eda_report.html")
+    with open("eda_report.html", "r", encoding="utf-8") as f:
+        report_html = f.read()
+    html(report_html, height=1000, scrolling=True)
+
+>>>>>>> b2a292889ae145893c8aad36652f871109564ab8
 # === Interface Utilisateur ===
 st.title("🛠️ DataStack - Plateforme de Data Engineering")
 
@@ -72,6 +95,11 @@ source_type = st.sidebar.radio(
     options=["Fichier local", "Base de données", "API"]
 )
 
+<<<<<<< HEAD
+=======
+data = None
+
+>>>>>>> b2a292889ae145893c8aad36652f871109564ab8
 if source_type == "Fichier local":
     uploaded_file = st.sidebar.file_uploader("Téléversez votre fichier", type=["csv", "xlsx"])
     delimiter = st.sidebar.text_input("Délimiteur (par défaut : ',')", value=";")
@@ -116,7 +144,11 @@ elif source_type == "API":
             st.dataframe(data.head())
 
 # 2. Nettoyage et exploration
+<<<<<<< HEAD
 if "data" in locals() and data is not None:
+=======
+if data is not None:
+>>>>>>> b2a292889ae145893c8aad36652f871109564ab8
     st.sidebar.header("2️⃣ Traiter les données")
     action = st.sidebar.selectbox(
         "Choisissez une action",
@@ -133,6 +165,7 @@ if "data" in locals() and data is not None:
         st.download_button("Télécharger les données nettoyées", data=cleaned_data.to_csv(index=False), file_name="cleaned_data.csv")
     elif action == "EDA (Exploration des Données)":
         st.subheader("📊 Exploration des Données")
+<<<<<<< HEAD
         explore_data(data)
 
 # 3. Construction de pipeline ETL
@@ -156,3 +189,9 @@ if "data" in locals() and data is not None:
             st.write("✔️ Données chargées dans la destination (non implémenté).")
 
 st.sidebar.info("Application évolutive - Ajoutez vos propres modules pour enrichir cette plateforme.")
+=======
+        st.sidebar.info("Cela peut prendre un moment selon la taille de votre jeu de données.")
+        if st.sidebar.button("Générer un rapport de profilage interactif"):
+            with st.spinner("Génération du rapport..."):
+                generate_profile_report(data)
+>>>>>>> b2a292889ae145893c8aad36652f871109564ab8
