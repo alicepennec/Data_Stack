@@ -14,7 +14,7 @@ def load_local_file(file, delimiter):
     """Charger un fichier local (CSV, Excel, etc.) avec un délimiteur défini."""
     try:
         if file.name.endswith(".csv"):
-            return pd.read_csv(file, delimiter=delimiter)
+            return pd.read_csv(file, delimiter=delimiter, engine='python')
         elif file.name.endswith(".xlsx"):
             return pd.read_excel(file)
         else:
@@ -84,7 +84,7 @@ data = None
 
 if source_type == "Fichier local":
     uploaded_file = st.sidebar.file_uploader("Téléversez votre fichier", type=["csv", "xlsx"])
-    delimiter = st.sidebar.text_input("Délimiteur (par défaut : ',')", value=",")
+    delimiter = st.sidebar.text_input("Délimiteur (par défaut : ',')", value=[',', ';', '/t'])
     if uploaded_file is not None:
         data = load_local_file(uploaded_file, delimiter)
 
