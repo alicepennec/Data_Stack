@@ -148,7 +148,7 @@ if data is not None:
                 generate_profile_report(data)
 
 
-# 3. Construction de pipeline ETL
+# 3. Conception BDD
 if data is not None:
     st.sidebar.header("3️⃣ Conception BDD")
     steps = st.sidebar.selectbox(
