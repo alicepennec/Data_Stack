@@ -1,0 +1,19 @@
+{
+    "mappings" : {
+        "properties" : {
+          "fields" : {
+            "properties" : {
+              "invoice" : {
+                "type" : "text",
+                "fields" : {
+                    "raw" : {
+                      "type" : "text",
+                      "index" : false
+                    }
+                  }
+                }
+            }
+          }
+        }
+    }
+}
