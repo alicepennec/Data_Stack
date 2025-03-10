@@ -84,7 +84,7 @@ data = None
 
 if source_type == "Fichier local":
     uploaded_file = st.sidebar.file_uploader("Téléversez votre fichier", type=["csv", "xlsx"])
-    delimiter = st.sidebar.text_input("Délimiteur (par défaut : ',')", value=[',', ';', '/t'])
+    delimiter = st.sidebar.text_input("Délimiteur (par défaut : ',')", value=',')
     if uploaded_file is not None:
         data = load_local_file(uploaded_file, delimiter)
 

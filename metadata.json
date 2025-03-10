@@ -1,0 +1,53 @@
+{"index":{"_index": "invoices","_id":1}}
+{"fields" : {"title" : "facture eau janvier 2023"}}
+{"index":{"_index": "invoices","_id":2}}
+{"fields" : {"title" : "facture eau février 2023"}}
+{"index":{"_index": "invoices","_id":3}}
+{"fields" : {"title" : "facture eau mars 2023"}}
+{"index":{"_index": "invoices","_id":4}}
+{"fields" : {"title" : "facture eau avril 2023"}}
+{"index":{"_index": "invoices","_id":5}}
+{"fields" : {"title" : "facture eau mai 2023"}}
+{"index":{"_index": "invoices","_id":6}}
+{"fields" : {"title" : "facture eau juin 2023"}}
+{"index":{"_index": "invoices","_id":7}}
+{"fields" : {"title" : "facture eau juillet 2023"}}
+{"index":{"_index": "invoices","_id":8}}
+{"fields" : {"title" : "facture eau aout 2023"}}
+{"index":{"_index": "invoices","_id":9}}
+{"fields" : {"title" : "facture eau septembre 2023"}}
+{"index":{"_index": "invoices","_id":10}}
+{"fields" : {"title" : "facture eau octobre 2023"}}
+{"index":{"_index": "invoices","_id":11}}
+{"fields" : {"title" : "facture eau novembre 2023"}}
+{"index":{"_index": "invoices","_id":12}}
+{"fields" : {"title" : "facture eau décembre 2023"}}
+{"index":{"_index": "invoices","_id":13}}
+{"fields" : {"title" : "facture eau janvier 2024"}}
+{"index":{"_index": "invoices","_id":14}}
+{"fields" : {"title" : "facture eau février 2024"}}
+{"index":{"_index": "invoices","_id":15}}
+{"fields" : {"title" : "facture eau mars 2024"}}
+{"index":{"_index": "invoices","_id":16}}
+{"fields" : {"title" : "facture eau avril 2024"}}
+{"index":{"_index": "invoices","_id":17}}
+{"fields" : {"title" : "facture eau mai 2024"}}
+{"index":{"_index": "invoices","_id":18}}
+{"fields" : {"title" : "facture eau juin 2024"}}
+{"index":{"_index": "invoices","_id":19}}
+{"fields" : {"title" : "facture eau juillet 2024"}}
+{"index":{"_index": "invoices","_id":20}}
+{"fields" : {"title" : "facture eau aout 2024"}}
+{"index":{"_index": "invoices","_id":21}}
+{"fields" : {"title" : "facture eau septembre 2024"}}
+{"index":{"_index": "invoices","_id":22}}
+{"fields" : {"title" : "facture eau octobre 2024"}}
+{"index":{"_index": "invoices","_id":23}}
+{"fields" : {"title" : "facture eau novembre 2024"}}
+{"index":{"_index": "invoices","_id":24}}
+{"fields" : {"title" : "facture eau décembre 2024"}}
+{"index":{"_index": "invoices","_id":25}}
+{"fields" : {"title" : "facture eau janvier 2025"}}
+{"index":{"_index": "invoices","_id":26}}
+{"fields" : {"title" : "facture eau janvier 2025"}}
+
