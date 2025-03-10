@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import requests
 from sqlalchemy import create_engine
-from ydata_profiling import ProfileReport
+from ydata_profiling import ProfileReport # type: ignore
 from streamlit.components.v1 import html
 
 # Configuration globale
